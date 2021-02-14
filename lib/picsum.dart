@@ -1,6 +1,10 @@
 import 'dart:math';
 
-String picsum(String path) {
-  final id = Random().nextInt(1000);
-  return "https://picsum.photos/id/$id$path";
+String picsumRandom(String path) {
+  final imageId = Random().nextInt(1000);
+  return "https://picsum.photos/id/$imageId$path";
+}
+
+String picsum(int imageId, String path) {
+  return "https://picsum.photos/id/$imageId$path";
 }
