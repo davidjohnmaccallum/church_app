@@ -26,6 +26,7 @@ dependencies:
   lipsum: ^1.0.1
   firebase_core: ^0.7.0
   cloud_firestore: ^0.16.0
+  transparent_image: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'media_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -8,15 +9,13 @@ class MediaList extends StatelessWidget {
   void onListTileTap(context, mediaItemId) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => MediaDetail(sermonId: mediaItemId)),
+      MaterialPageRoute(builder: (context) => MediaDetail(sermonId: mediaItemId)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final mediaItemsFuture =
-        FirebaseFirestore.instance.collection('sermons').get();
+    final mediaItemsFuture = FirebaseFirestore.instance.collection('sermons').get();
 
     return Scaffold(
       appBar: AppBar(
@@ -37,13 +36,12 @@ class MediaList extends StatelessWidget {
               children: snapshot.data.docs
                   .map(
                     (it) => ListTile(
-                      leading: FadeInImage(
-                        placeholder: AssetImage(
-                            "assets/images/thumbnail_placeholder.png"),
-                        image: NetworkImage(it.data()['thumbnailUrl']),
+                      leading: FadeInImage.memoryNetwork(
+                        placeholder: kTransparentImage,
+                        image: it.data()['thumbnailUrl'] ?? '',
                       ),
-                      title: Text(it.data()['title']),
-                      subtitle: Text(it.data()['author']),
+                      title: Text(it.data()['title'] ?? ''),
+                      subtitle: Text(it.data()['author'] ?? ''),
                       trailing: Icon(Icons.play_arrow),
                       onTap: () => onListTileTap(context, it.id),
                     ),

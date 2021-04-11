@@ -1,7 +1,6 @@
-import 'package:church_app/picsum.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lipsum/lipsum.dart' as lipsum;
+import 'package:transparent_image/transparent_image.dart';
 
 class MediaDetail extends StatelessWidget {
   const MediaDetail({
@@ -15,8 +14,7 @@ class MediaDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sermonFuture =
-        FirebaseFirestore.instance.collection('sermons').doc(sermonId).get();
+    final sermonFuture = FirebaseFirestore.instance.collection('sermons').doc(sermonId).get();
 
     return FutureBuilder<DocumentSnapshot>(
         future: sermonFuture,
@@ -36,9 +34,7 @@ class MediaDetail extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(snapshot.data['title']),
-              actions: [
-                IconButton(icon: Icon(Icons.share), onPressed: onSharePressed)
-              ],
+              actions: [IconButton(icon: Icon(Icons.share), onPressed: onSharePressed)],
             ),
             body: SingleChildScrollView(
               child: Column(
@@ -48,12 +44,9 @@ class MediaDetail extends StatelessWidget {
                     width: double.infinity,
                     child: FittedBox(
                       fit: BoxFit.cover,
-                      child: FadeInImage(
-                        placeholder:
-                            AssetImage("assets/images/image_placeholder.png"),
-                        image: NetworkImage(
-                          snapshot.data['imageUrl'],
-                        ),
+                      child: FadeInImage.memoryNetwork(
+                        placeholder: kTransparentImage,
+                        image: snapshot.data['imageUrl'] ?? '',
                       ),
                     ),
                   ),
@@ -63,10 +56,10 @@ class MediaDetail extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          snapshot.data['title'],
+                          snapshot.data['title'] ?? '',
                           style: TextStyle(fontSize: 30.0),
                         ),
-                        Text(snapshot.data['description']),
+                        Text(snapshot.data['description'] ?? ''),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: Row(
@@ -111,14 +104,12 @@ class MediaDetail extends StatelessWidget {
                             Positioned(
                               right: 16.0,
                               bottom: 0.0,
-                              child: Text("0:00",
-                                  style: Theme.of(context).textTheme.caption),
+                              child: Text("0:00", style: Theme.of(context).textTheme.caption),
                             ),
                             Positioned(
                               left: 16.0,
                               bottom: 0.0,
-                              child: Text("0:00",
-                                  style: Theme.of(context).textTheme.caption),
+                              child: Text("0:00", style: Theme.of(context).textTheme.caption),
                             ),
                           ],
                         )
