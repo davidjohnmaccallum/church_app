@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class MediaDetail extends StatelessWidget {
-  const MediaDetail({
-    Key key,
-    this.sermonId,
-  }) : super(key: key);
-
+  final Function onPlayPressed;
   final String sermonId;
 
   void onSharePressed() {}
+
+  const MediaDetail({
+    Key key,
+    this.sermonId,
+    this.onPlayPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,10 @@ class MediaDetail extends StatelessWidget {
                                 child: IconButton(
                                   icon: Icon(Icons.play_arrow),
                                   iconSize: 60.0,
-                                  onPressed: () => {},
+                                  onPressed: () {
+                                    if (onPlayPressed == null) return;
+                                    onPlayPressed();
+                                  },
                                 ),
                               ),
                               Expanded(

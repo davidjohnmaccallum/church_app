@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'media_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MediaList extends StatelessWidget {
-  const MediaList({Key key}) : super(key: key);
+  final Function onListTileTap;
 
-  void onListTileTap(context, mediaItemId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MediaDetail(sermonId: mediaItemId)),
-    );
-  }
+  const MediaList({Key key, this.onListTileTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +37,10 @@ class MediaList extends StatelessWidget {
                       title: Text(it.data()['title'] ?? ''),
                       subtitle: Text(it.data()['author'] ?? ''),
                       trailing: Icon(Icons.play_arrow),
-                      onTap: () => onListTileTap(context, it.id),
+                      onTap: () {
+                        if (onListTileTap == null) return;
+                        onListTileTap(context, it.id);
+                      },
                     ),
                   )
                   .toList());
