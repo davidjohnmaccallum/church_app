@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MediaList extends StatelessWidget {
+class SermonList extends StatelessWidget {
   final Function onListTileTap;
 
-  const MediaList({Key key, this.onListTileTap}) : super(key: key);
+  const SermonList({Key key, this.onListTileTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

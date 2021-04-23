@@ -1,18 +1,13 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:church_app/media_list.dart';
+import 'package:church_app/sermon_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'audio_player_task.dart';
-import 'media_detail.dart';
+import 'sermon_detail.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
-}
-
-_backgroundAudioTaskEntrypoint() {
-  AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
 class MyApp extends StatelessWidget {
@@ -35,7 +30,7 @@ class MyApp extends StatelessWidget {
           ),
           home: AudioServiceWidget(
               child: snapshot.connectionState == ConnectionState.done
-                  ? MediaList(onListTileTap: onListTileTap)
+                  ? SermonList(onListTileTap: onListTileTap)
                   : Scaffold(body: Center(child: Text("Loading...")))),
         );
       },
@@ -46,25 +41,9 @@ class MyApp extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => MediaDetail(
+          builder: (context) => SermonDetail(
                 sermonId: mediaItemId,
-                onPlayPressed: onPlayPressed,
               )),
-    );
-  }
-
-  void onPlayPressed() async {
-    if (!AudioService.running) {
-      bool res = await startAudioPlayerTask();
-      if (!res) print('Audio service failed to start');
-    }
-  }
-
-  Future<bool> startAudioPlayerTask() {
-    return AudioService.start(
-      backgroundTaskEntrypoint: _backgroundAudioTaskEntrypoint,
-      rewindInterval: Duration(seconds: 10),
-      fastForwardInterval: Duration(seconds: 30),
     );
   }
 }
