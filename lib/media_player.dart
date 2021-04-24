@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'audio_player_task.dart';
+import 'media_player_debug_info.dart';
 import 'models/Sermon.dart';
 
 _backgroundAudioTaskEntrypoint() {
@@ -48,24 +47,38 @@ class _MediaPlayerState extends State<MediaPlayer> {
       print("playbackStateStream " + playbackState.toString());
       setState(() {
         this.playbackState = playbackState;
+        if (isCompleted(playbackState)) {
+          AudioService.stop();
+        }
       });
     });
 
     AudioService.positionStream.listen((Duration position) {
       if (isUserSeeking) return;
       print("positionStream " + position.toString());
-      setState(() {
-        this.position = position;
-        if (position != null && mediaItem != null && mediaItem.duration != null) {
-          seekBarValue = min(position.inMilliseconds / mediaItem.duration.inMilliseconds, 1);
-        } else {
-          seekBarValue = 0;
-        }
-      });
+      // setState(() {
+      //   this.position = position;
+      //   if (position != null && mediaItem != null && mediaItem.duration != null) {
+      //     seekBarValue = min(position.inMilliseconds / mediaItem.duration.inMilliseconds, 1);
+      //   } else {
+      //     seekBarValue = 0;
+      //   }
+      // });
     });
   }
 
-  Future startPlayback() async {
+  bool isAudioNotLoaded(PlaybackState state) =>
+      state == null ||
+      state.processingState == AudioProcessingState.none ||
+      state.processingState == AudioProcessingState.completed ||
+      state.processingState == AudioProcessingState.error;
+
+  bool isPlaying(PlaybackState state) => state != null && playbackState.playing;
+
+  bool isCompleted(PlaybackState state) =>
+      state != null && playbackState.processingState == AudioProcessingState.completed;
+
+  Future loadAndPlay() async {
     print("startPlayback");
     AudioService.playMediaItem(
       MediaItem(
@@ -77,19 +90,16 @@ class _MediaPlayerState extends State<MediaPlayer> {
     );
   }
 
-  void onPlayPressed() async {
-    print("onPlayPressed");
+  void onPlayPausePressed() async {
+    print("onPlayPausePressed");
     if (!AudioService.running) {
       await startBackgroundTask();
     }
-    if (playbackState == null ||
-        playbackState.processingState == AudioProcessingState.none ||
-        playbackState.processingState == AudioProcessingState.completed ||
-        playbackState.processingState == AudioProcessingState.error) {
-      await startPlayback();
-    } else if (playbackState.playing) {
+    if (isAudioNotLoaded(playbackState)) {
+      await loadAndPlay();
+    } else if (isPlaying(playbackState)) {
       await AudioService.pause();
-    } else if (!playbackState.playing) {
+    } else if (!isPlaying(playbackState)) {
       await AudioService.play();
     }
   }
@@ -112,10 +122,10 @@ class _MediaPlayerState extends State<MediaPlayer> {
               ),
               Expanded(
                 child: IconButton(
-                  icon: Icon(Icons.play_arrow),
+                  icon: Icon(isPlaying(playbackState) ? Icons.pause : Icons.play_arrow),
                   iconSize: 60.0,
                   onPressed: () {
-                    onPlayPressed();
+                    onPlayPausePressed();
                   },
                 ),
               ),
@@ -153,7 +163,11 @@ class _MediaPlayerState extends State<MediaPlayer> {
             ),
           ],
         ),
-        Text("State: ${playbackState?.processingState}")
+        MediaPlayerDebugInfo(
+          position: position,
+          playbackState: playbackState,
+          mediaItem: mediaItem,
+        )
       ],
     );
   }
