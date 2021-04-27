@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +24,7 @@ class MediaPlayer extends StatefulWidget {
 class _MediaPlayerState extends State<MediaPlayer> {
   MediaItem mediaItem;
   PlaybackState playbackState;
-  Duration position;
   bool isUserSeeking = false;
-  double seekBarValue = 0.0;
 
   Future startBackgroundTask() async {
     print("startBackgroundTask");
@@ -51,19 +51,6 @@ class _MediaPlayerState extends State<MediaPlayer> {
           AudioService.stop();
         }
       });
-    });
-
-    AudioService.positionStream.listen((Duration position) {
-      if (isUserSeeking) return;
-      print("positionStream " + position.toString());
-      // setState(() {
-      //   this.position = position;
-      //   if (position != null && mediaItem != null && mediaItem.duration != null) {
-      //     seekBarValue = min(position.inMilliseconds / mediaItem.duration.inMilliseconds, 1);
-      //   } else {
-      //     seekBarValue = 0;
-      //   }
-      // });
     });
   }
 
@@ -102,6 +89,43 @@ class _MediaPlayerState extends State<MediaPlayer> {
     } else if (!isPlaying(playbackState)) {
       await AudioService.play();
     }
+  }
+
+  void onSeekBarChanged(double value) {
+    //print("onSeekBarChanged $value");
+    // setState(() {
+    //   seekBarValue = value;
+    // });
+  }
+
+  void onSeekBarChangeStart(double value) {
+    print("onSeekBarChangeStart $value");
+    isUserSeeking = true;
+  }
+
+  void onSeekBarChangeEnd(double value) {
+    print("onSeekBarChangeEnd $value");
+    isUserSeeking = false;
+    if (mediaItem == null || mediaItem.duration == null) return;
+    num seekTo = mediaItem.duration.inMilliseconds * value;
+    AudioService.seekTo(Duration(milliseconds: seekTo.round()));
+  }
+
+  String printPlayedTime(Duration position) {
+    if (position == null) return "0:00";
+    return printDuration(position);
+  }
+
+  String printRemainingTime(Duration position, MediaItem mediaItem) {
+    if (position == null) return "0:00";
+    if (mediaItem == null || mediaItem.duration == null) return "O:00";
+    return printDuration(mediaItem.duration - position);
+  }
+
+  String printDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${duration.inMinutes}:$twoDigitSeconds";
   }
 
   @override
@@ -145,30 +169,51 @@ class _MediaPlayerState extends State<MediaPlayer> {
             ],
           ),
         ),
-        Stack(
-          children: [
-            Slider(
-              value: 0.3,
-              onChanged: (d) => {},
-            ),
-            Positioned(
-              right: 16.0,
-              bottom: 0.0,
-              child: Text("0:00", style: Theme.of(context).textTheme.caption),
-            ),
-            Positioned(
-              left: 16.0,
-              bottom: 0.0,
-              child: Text("0:00", style: Theme.of(context).textTheme.caption),
-            ),
-          ],
-        ),
+        buildSeekBar(context),
         MediaPlayerDebugInfo(
-          position: position,
+          //position: position,
           playbackState: playbackState,
           mediaItem: mediaItem,
         )
       ],
+    );
+  }
+
+  // TODO: Position stream not updating after seeking.
+
+  Widget buildSeekBar(BuildContext context) {
+    return StreamBuilder(
+      stream: AudioService.positionStream,
+      builder: (context, snapshot) {
+        Duration position = snapshot.data;
+        double seekBarValue = 0.0;
+        if (position != null && mediaItem != null && mediaItem.duration != null) {
+          seekBarValue = min(position.inMilliseconds / mediaItem.duration.inMilliseconds, 1);
+        } else {
+          seekBarValue = 0;
+        }
+
+        return Stack(
+          children: [
+            Slider(
+              value: seekBarValue,
+              onChanged: onSeekBarChanged,
+              onChangeStart: onSeekBarChangeStart,
+              onChangeEnd: onSeekBarChangeEnd,
+            ),
+            Positioned(
+              left: 16.0,
+              bottom: 0.0,
+              child: Text(printPlayedTime(snapshot.data), style: Theme.of(context).textTheme.caption),
+            ),
+            Positioned(
+              right: 16.0,
+              bottom: 0.0,
+              child: Text(printRemainingTime(snapshot.data, mediaItem), style: Theme.of(context).textTheme.caption),
+            ),
+          ],
+        );
+      },
     );
   }
 }
