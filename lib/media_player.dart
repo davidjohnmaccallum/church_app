@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'audio_player_task.dart';
 import 'media_player_debug_info.dart';
@@ -10,6 +11,13 @@ import 'models/Sermon.dart';
 
 _backgroundAudioTaskEntrypoint() {
   AudioServiceBackground.run(() => AudioPlayerTask());
+}
+
+class MediaState {
+  final MediaItem mediaItem;
+  final Duration position;
+
+  MediaState(this.mediaItem, this.position);
 }
 
 class MediaPlayer extends StatefulWidget {
@@ -100,15 +108,19 @@ class _MediaPlayerState extends State<MediaPlayer> {
 
   void onSeekBarChangeStart(double value) {
     print("onSeekBarChangeStart $value");
-    isUserSeeking = true;
+    setState(() {
+      isUserSeeking = true;
+    });
   }
 
   void onSeekBarChangeEnd(double value) {
     print("onSeekBarChangeEnd $value");
-    isUserSeeking = false;
-    if (mediaItem == null || mediaItem.duration == null) return;
-    num seekTo = mediaItem.duration.inMilliseconds * value;
-    AudioService.seekTo(Duration(milliseconds: seekTo.round()));
+    setState(() {
+      isUserSeeking = false;
+      if (mediaItem == null || mediaItem.duration == null) return;
+      num seekTo = mediaItem.duration.inMilliseconds * value;
+      AudioService.seekTo(Duration(milliseconds: seekTo.round()));
+    });
   }
 
   String printPlayedTime(Duration position) {
@@ -127,6 +139,11 @@ class _MediaPlayerState extends State<MediaPlayer> {
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${duration.inMinutes}:$twoDigitSeconds";
   }
+
+  Stream<MediaState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duration, MediaState>(
+      AudioService.currentMediaItemStream,
+      AudioService.positionStream,
+      (mediaItem, position) => MediaState(mediaItem, position));
 
   @override
   Widget build(BuildContext context) {
@@ -182,13 +199,13 @@ class _MediaPlayerState extends State<MediaPlayer> {
   // TODO: Position stream not updating after seeking.
 
   Widget buildSeekBar(BuildContext context) {
-    return StreamBuilder(
-      stream: AudioService.positionStream,
+    return StreamBuilder<MediaState>(
+      stream: _mediaStateStream,
       builder: (context, snapshot) {
-        Duration position = snapshot.data;
+        MediaState mediaState = snapshot.data;
         double seekBarValue = 0.0;
-        if (position != null && mediaItem != null && mediaItem.duration != null) {
-          seekBarValue = min(position.inMilliseconds / mediaItem.duration.inMilliseconds, 1);
+        if (mediaState?.position != null && mediaState?.mediaItem?.duration != null) {
+          seekBarValue = min(mediaState.position.inMilliseconds / mediaItem.duration.inMilliseconds, 1);
         } else {
           seekBarValue = 0;
         }
@@ -204,12 +221,13 @@ class _MediaPlayerState extends State<MediaPlayer> {
             Positioned(
               left: 16.0,
               bottom: 0.0,
-              child: Text(printPlayedTime(snapshot.data), style: Theme.of(context).textTheme.caption),
+              child: Text(printPlayedTime(mediaState?.position), style: Theme.of(context).textTheme.caption),
             ),
             Positioned(
               right: 16.0,
               bottom: 0.0,
-              child: Text(printRemainingTime(snapshot.data, mediaItem), style: Theme.of(context).textTheme.caption),
+              child: Text(printRemainingTime(mediaState?.position, mediaState?.mediaItem),
+                  style: Theme.of(context).textTheme.caption),
             ),
           ],
         );
