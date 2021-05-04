@@ -48,43 +48,43 @@ class MediaPlayer extends StatelessWidget {
 
   final _0_00 = "0:00";
 
-  String printPlayedTime() {
+  String _printPlayedTime() {
     return {
           MediaPlayerState.Loading: _0_00,
-          MediaPlayerState.Buffering: printDuration(position),
-          MediaPlayerState.Playing: printDuration(position),
-          MediaPlayerState.Seeking: printDuration(seekToPosition),
+          MediaPlayerState.Buffering: _printDuration(position),
+          MediaPlayerState.Playing: _printDuration(position),
+          MediaPlayerState.Seeking: _printDuration(seekToPosition),
           MediaPlayerState.Errored: _0_00,
-          MediaPlayerState.Stopped: printDuration(length),
+          MediaPlayerState.Stopped: _printDuration(length),
         }[state] ??
         _0_00;
   }
 
-  Duration diffDuration(Duration a, Duration b) {
+  Duration _diffDuration(Duration a, Duration b) {
     if (a == null || b == null) return Duration();
     return a - b;
   }
 
-  String printRemainingTime() {
+  String _printRemainingTime() {
     return {
           MediaPlayerState.Loading: _0_00,
-          MediaPlayerState.Buffering: printDuration(diffDuration(length, position)),
-          MediaPlayerState.Playing: printDuration(diffDuration(length, position)),
-          MediaPlayerState.Seeking: printDuration(diffDuration(length, seekToPosition)),
+          MediaPlayerState.Buffering: _printDuration(_diffDuration(length, position)),
+          MediaPlayerState.Playing: _printDuration(_diffDuration(length, position)),
+          MediaPlayerState.Seeking: _printDuration(_diffDuration(length, seekToPosition)),
           MediaPlayerState.Errored: _0_00,
-          MediaPlayerState.Stopped: printDuration(length),
+          MediaPlayerState.Stopped: _printDuration(length),
         }[state] ??
         _0_00;
   }
 
-  String printDuration(Duration duration) {
+  String _printDuration(Duration duration) {
     if (duration == null) return _0_00;
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${duration.inMinutes}:$twoDigitSeconds";
   }
 
-  double getValue() {
+  double _getValue() {
     return {
           MediaPlayerState.Loading: 0.0,
           MediaPlayerState.Buffering: position?.inMilliseconds?.toDouble(),
@@ -96,41 +96,41 @@ class MediaPlayer extends StatelessWidget {
         0;
   }
 
-  String getFeedback() {
-    return {
-          MediaPlayerState.Loading: "Loading...",
-          MediaPlayerState.Buffering: "Buffering...",
-          MediaPlayerState.Playing: "",
-          MediaPlayerState.Seeking: "Buffering...",
-          MediaPlayerState.Errored: "Error",
-          MediaPlayerState.Stopped: "",
-        }[state] ??
-        "";
-  }
-
-  String getPlaybackSpeed() {
+  String _getPlaybackSpeed() {
     var f = NumberFormat("###.#");
     return "${f.format(playbackSpeed)}x";
   }
 
   @override
   Widget build(BuildContext context) {
-    return {
-          MediaPlayerState.Stopped: buildStoppedPlayer(context),
-          MediaPlayerState.Loading: buildLoadingPlayer(),
-          MediaPlayerState.Playing: buildPlayingPlayer(context),
-          MediaPlayerState.Buffering: buildBufferingPlayer(context),
-          MediaPlayerState.Seeking: buildBufferingPlayer(context),
-          MediaPlayerState.Errored: buildErroredPlayer(context),
-        }[state] ??
-        Container();
+    var player = {
+      MediaPlayerState.Stopped: _buildStoppedPlayer(context),
+      MediaPlayerState.Loading: _buildLoadingPlayer(),
+      MediaPlayerState.Playing: _buildPlayingPlayer(context),
+      MediaPlayerState.Buffering: _buildBufferingPlayer(context),
+      MediaPlayerState.Seeking: _buildBufferingPlayer(context),
+      MediaPlayerState.Errored: _buildErroredPlayer(context),
+    }[state];
+    var height = {
+      MediaPlayerState.Stopped: 65.0,
+      MediaPlayerState.Loading: 65.0,
+      MediaPlayerState.Playing: 172.0,
+      MediaPlayerState.Buffering: 172.0,
+      MediaPlayerState.Seeking: 172.0,
+      MediaPlayerState.Errored: 65.0,
+    }[state];
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 100),
+      height: height,
+      child: player,
+    );
   }
 
-  Widget buildStoppedPlayer(BuildContext context) {
+  Widget _buildStoppedPlayer(BuildContext context) {
     return Container(
-      height: 65,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IconButton(
             icon: Icon(Icons.play_arrow),
@@ -142,11 +142,11 @@ class MediaPlayer extends StatelessWidget {
     );
   }
 
-  Widget buildLoadingPlayer() {
+  Widget _buildLoadingPlayer() {
     return Container(
-      height: 65,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
@@ -156,7 +156,7 @@ class MediaPlayer extends StatelessWidget {
     );
   }
 
-  Widget buildPlayingPlayer(BuildContext context) {
+  Widget _buildPlayingPlayer(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -186,7 +186,7 @@ class MediaPlayer extends StatelessWidget {
             Container(),
             Container(),
             TextButton(
-              child: Text(getPlaybackSpeed()),
+              child: Text(_getPlaybackSpeed()),
               onPressed: onChangeSpeed,
             ),
           ],
@@ -194,7 +194,7 @@ class MediaPlayer extends StatelessWidget {
         Stack(
           children: [
             Slider(
-              value: getValue(),
+              value: _getValue(),
               max: length?.inMilliseconds?.toDouble() ?? 1,
               onChanged: onChanged,
               onChangeStart: onChangeStart,
@@ -204,7 +204,7 @@ class MediaPlayer extends StatelessWidget {
               left: 16.0,
               bottom: 0.0,
               child: Text(
-                printPlayedTime(),
+                _printPlayedTime(),
                 style: Theme.of(context).textTheme.caption,
               ),
             ),
@@ -212,7 +212,7 @@ class MediaPlayer extends StatelessWidget {
               right: 16.0,
               bottom: 0.0,
               child: Text(
-                printRemainingTime(),
+                _printRemainingTime(),
                 style: Theme.of(context).textTheme.caption,
               ),
             ),
@@ -222,7 +222,7 @@ class MediaPlayer extends StatelessWidget {
     );
   }
 
-  Widget buildBufferingPlayer(BuildContext context) {
+  Widget _buildBufferingPlayer(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -250,7 +250,7 @@ class MediaPlayer extends StatelessWidget {
             Container(),
             Container(),
             TextButton(
-              child: Text(getPlaybackSpeed()),
+              child: Text(_getPlaybackSpeed()),
               onPressed: onChangeSpeed,
             ),
           ],
@@ -258,7 +258,7 @@ class MediaPlayer extends StatelessWidget {
         Stack(
           children: [
             Slider(
-              value: getValue(),
+              value: _getValue(),
               max: length?.inMilliseconds?.toDouble() ?? 1,
               onChanged: onChanged,
               onChangeStart: onChangeStart,
@@ -268,7 +268,7 @@ class MediaPlayer extends StatelessWidget {
               left: 16.0,
               bottom: 0.0,
               child: Text(
-                printPlayedTime(),
+                _printPlayedTime(),
                 style: Theme.of(context).textTheme.caption,
               ),
             ),
@@ -276,7 +276,7 @@ class MediaPlayer extends StatelessWidget {
               right: 16.0,
               bottom: 0.0,
               child: Text(
-                printRemainingTime(),
+                _printRemainingTime(),
                 style: Theme.of(context).textTheme.caption,
               ),
             ),
@@ -286,7 +286,7 @@ class MediaPlayer extends StatelessWidget {
     );
   }
 
-  Widget buildErroredPlayer(BuildContext context) {
+  Widget _buildErroredPlayer(BuildContext context) {
     return Column(
       children: [
         Row(
