@@ -5,11 +5,25 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Storyboard",
+      "name": "Media Player Storyboard",
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
-      "program": "lib/storyboard/storyboard.dart"
+      "program": "lib/storyboard/media_player_storyboard.dart"
+    },
+    {
+      "name": "App Storyboard",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/storyboard/app_storyboard.dart"
+    },
+    {
+      "name": "App",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main.dart"
     }
   ]
 }
