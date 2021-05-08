@@ -2,7 +2,7 @@ import 'package:church_app/picsum.dart';
 import 'package:flutter/material.dart';
 import 'package:storyboard/storyboard.dart';
 
-import '../series_list.dart';
+import '../header_list.dart';
 
 void main() {
   runApp(StoryboardApp([
@@ -14,10 +14,10 @@ class SeriesListStory extends FullScreenStory {
   @override
   List<Widget> get storyContent {
     return [
-      SeriesList(
+      HeaderList(
         "Hello",
         picsumRandom("/600"),
-        List<SeriesListModel>.filled(3, SeriesListModel("Hello", "World", picsumRandom("/200"), () {})),
+        List<HeaderListModel>.filled(3, HeaderListModel("Hello", "World", picsumRandom("/200"), () {})),
       ),
     ];
   }

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-class SeriesListModel {
+class HeaderListModel {
   final String title;
   final String subtitle;
   final String imageUrl;
   final Function() onTap;
 
-  SeriesListModel(
+  HeaderListModel(
     this.title,
     this.subtitle,
     this.imageUrl,
@@ -15,12 +15,12 @@ class SeriesListModel {
   );
 }
 
-class SeriesList extends StatelessWidget {
+class HeaderList extends StatelessWidget {
   final String title;
   final String titleImageUrl;
-  final List<SeriesListModel> items;
+  final List<HeaderListModel> items;
 
-  const SeriesList(
+  const HeaderList(
     this.title,
     this.titleImageUrl,
     this.items, {
@@ -34,7 +34,7 @@ class SeriesList extends StatelessWidget {
         itemCount: items.length + 1,
         itemBuilder: (context, i) {
           if (i == 0) {
-            return ListHeader(title, titleImageUrl);
+            return Header(title, titleImageUrl);
           }
           var item = items[i - 1];
           return buildListTile(item.title, item.subtitle, item.imageUrl, item.onTap);
@@ -60,11 +60,11 @@ class SeriesList extends StatelessWidget {
   }
 }
 
-class ListHeader extends StatelessWidget {
+class Header extends StatelessWidget {
   final String title;
   final String imageUrl;
 
-  const ListHeader(
+  const Header(
     this.title,
     this.imageUrl, {
     Key key,
