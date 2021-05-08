@@ -112,8 +112,8 @@ class MediaPlayer extends StatelessWidget {
       MediaPlayerState.Errored: _buildErroredPlayer(context),
     }[state];
     var height = {
-      MediaPlayerState.Stopped: 65.0,
-      MediaPlayerState.Loading: 65.0,
+      MediaPlayerState.Stopped: 75.0,
+      MediaPlayerState.Loading: 75.0,
       MediaPlayerState.Playing: 172.0,
       MediaPlayerState.Buffering: 172.0,
       MediaPlayerState.Seeking: 172.0,
@@ -146,7 +146,7 @@ class MediaPlayer extends StatelessWidget {
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.black),

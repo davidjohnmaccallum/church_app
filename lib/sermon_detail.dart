@@ -1,79 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:transparent_image/transparent_image.dart';
 
-import 'media_player.dart';
-import 'models/Sermon.dart';
+import 'header.dart';
+import 'media_player/media_player.dart';
 
 class SermonDetail extends StatelessWidget {
-  final String sermonId;
+  final String title;
+  final String titleImageUrl;
+  final String description;
 
-  const SermonDetail({
+  const SermonDetail(
+    this.title,
+    this.titleImageUrl,
+    this.description, {
     Key key,
-    this.sermonId,
   }) : super(key: key);
-
-  void onSharePressed() {
-    print("MediaDetailState.onSharePressed()");
-  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Sermon>(
-        future: Sermon.get(sermonId),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            print(snapshot.error);
-          }
-
-          if (snapshot.connectionState != ConnectionState.done) {
-            return Scaffold(
-              body: Center(
-                child: Text("Loading..."),
-              ),
-            );
-          }
-
-          Sermon sermon = snapshot.data;
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(sermon.title ?? ''),
-              actions: [IconButton(icon: Icon(Icons.share), onPressed: onSharePressed)],
-            ),
-            body: SingleChildScrollView(
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Header(title, titleImageUrl),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 200,
-                    width: double.infinity,
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: FadeInImage.memoryNetwork(
-                        placeholder: kTransparentImage,
-                        image: sermon.imageUrl ?? '',
-                      ),
-                    ),
+                  MediaPlayer(
+                    state: MediaPlayerState.Stopped,
+                    isPlaying: false,
+                    playbackSpeed: 1.5,
+                    length: Duration(seconds: 150),
+                    position: Duration(seconds: 50),
+                    seekToPosition: Duration(seconds: 100),
+                    onChanged: (double value) => print("onChanged $value"),
+                    onChangeStart: (double value) => print("onChangeStart $value"),
+                    onChangeEnd: (double value) => print("onChangeEnd $value"),
+                    start: () => print("start"),
+                    onPlay: () => print("onPlay"),
+                    onPause: () => print("onPause"),
+                    onForward: () => print("onForward"),
+                    onReplay: () => print("onReplay"),
+                    onChangeSpeed: () => print("onChangeSpeed"),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          sermon.title ?? '',
-                          style: TextStyle(fontSize: 30.0),
-                        ),
-                        Text(sermon.description ?? ''),
-                        MediaPlayer(
-                          sermon: sermon,
-                        ),
-                      ],
-                    ),
-                  ),
+                  Text(description),
                 ],
               ),
             ),
-          );
-        });
+          ],
+        ),
+      ),
+    );
   }
 }

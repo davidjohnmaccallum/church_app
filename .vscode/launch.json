@@ -5,13 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Media Player Storyboard",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "debug",
-      "program": "lib/storyboard/media_player_storyboard.dart"
-    },
-    {
       "name": "App Storyboard",
       "request": "launch",
       "type": "dart",
