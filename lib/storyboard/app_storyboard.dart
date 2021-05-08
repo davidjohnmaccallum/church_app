@@ -1,10 +1,10 @@
 import 'package:church_app/media_player/media_player.dart';
-import 'package:church_app/picsum.dart';
-import 'package:church_app/sermon_detail.dart';
+import 'package:church_app/utils/picsum.dart';
+import 'package:church_app/pages/sermon_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:storyboard/storyboard.dart';
 
-import '../header.dart';
+import '../components/image_header.dart';
 
 void main() {
   runApp(StoryboardApp([
@@ -19,13 +19,16 @@ void main() {
   ]));
 }
 
-class HeaderStory extends FullScreenStory {
+class HeaderStory extends Story {
   @override
   List<Widget> get storyContent {
     return [
-      Header(
-        "Hello",
-        picsumRandom("/600"),
+      SizedBox(
+        width: 300,
+        child: ImageHeader(
+          "Hello",
+          picsumRandom("/600"),
+        ),
       ),
     ];
   }

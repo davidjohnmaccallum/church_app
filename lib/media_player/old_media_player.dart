@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'audio_player_task.dart';
 import 'media_player_debug_info.dart';
-import 'models/Sermon.dart';
+import '../models/Sermon.dart';
 
 _backgroundAudioTaskEntrypoint() {
   AudioServiceBackground.run(() => AudioPlayerTask());

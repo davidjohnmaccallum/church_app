@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import 'header.dart';
+import 'image_header.dart';
 
-class HeaderListModel {
+class ImageHeaderListModel {
   final String title;
   final String subtitle;
   final String imageUrl;
-  final Function() onTap;
+  final Function(BuildContext context) onTap;
 
-  HeaderListModel(
+  ImageHeaderListModel(
     this.title,
     this.subtitle,
     this.imageUrl,
@@ -17,12 +17,12 @@ class HeaderListModel {
   );
 }
 
-class HeaderList extends StatelessWidget {
+class ImageHeaderList extends StatelessWidget {
   final String title;
   final String titleImageUrl;
-  final List<HeaderListModel> items;
+  final List<ImageHeaderListModel> items;
 
-  const HeaderList(
+  const ImageHeaderList(
     this.title,
     this.titleImageUrl,
     this.items, {
@@ -36,10 +36,12 @@ class HeaderList extends StatelessWidget {
         itemCount: items.length + 1,
         itemBuilder: (context, i) {
           if (i == 0) {
-            return Header(title, titleImageUrl);
+            return ImageHeader(title, titleImageUrl);
           }
           var item = items[i - 1];
-          return buildListTile(item.title, item.subtitle, item.imageUrl, item.onTap);
+          return buildListTile(item.title, item.subtitle, item.imageUrl, () {
+            if (item.onTap != null) item.onTap(context);
+          });
         },
       ),
     );

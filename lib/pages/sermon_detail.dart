@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'header.dart';
-import 'media_player/media_player.dart';
+import '../components/image_header.dart';
+import '../media_player/media_player.dart';
 
 class SermonDetail extends StatelessWidget {
   final String title;
@@ -21,7 +21,7 @@ class SermonDetail extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Header(title, titleImageUrl),
+            ImageHeader(title, titleImageUrl),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(

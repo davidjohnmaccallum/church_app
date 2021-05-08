@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../utils.dart';
+import '../utils/utils.dart';
 
 class Sermon {
   String id;
