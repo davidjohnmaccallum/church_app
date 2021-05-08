@@ -117,7 +117,7 @@ class MediaPlayer extends StatelessWidget {
       MediaPlayerState.Playing: 172.0,
       MediaPlayerState.Buffering: 172.0,
       MediaPlayerState.Seeking: 172.0,
-      MediaPlayerState.Errored: 65.0,
+      MediaPlayerState.Errored: 93.0,
     }[state];
     return AnimatedContainer(
       duration: Duration(milliseconds: 100),

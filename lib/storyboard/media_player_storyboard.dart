@@ -1,6 +1,17 @@
-import 'package:church_app/media_player/media_player.dart';
 import 'package:flutter/material.dart';
 import 'package:storyboard/storyboard.dart';
+import 'package:church_app/media_player/media_player.dart';
+
+void main() {
+  runApp(StoryboardApp([
+    MediaPlayerStopped(),
+    MediaPlayerLoading(),
+    MediaPlayerPlaying(),
+    MediaPlayerSeeking(),
+    MediaPlayerBuffering(),
+    MediaPlayerErrored(),
+  ]));
+}
 
 class MediaPlayerStopped extends Story {
   @override
